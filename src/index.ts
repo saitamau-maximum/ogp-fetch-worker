@@ -76,11 +76,13 @@ export default {
       ogp.faviconUrl = new URL(ogp.faviconUrl, decodedUrl).toString();
     }
 
-    return new Response(JSON.stringify(ogp), {
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": `public, s-maxage=${CACHE_DURATION}`,
-      },
-    });
+    const headers = new Headers();
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Access-Control-Allow-Methods", "GET");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Content-Type", "application/json");
+    headers.set("Cache-Control", `public, s-maxage=${CACHE_DURATION}`);
+
+    return new Response(JSON.stringify(ogp), { headers });
   },
 } as ExportedHandler;
