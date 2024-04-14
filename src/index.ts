@@ -1,45 +1,47 @@
 class OGPParser {
-  title?: string;
-  description?: string;
-  imageUrl?: string;
-  faviconUrl?: string;
+  title = "";
+  description = "";
+  imageUrl = "";
+  faviconUrl = "";
 
   element(element: Element) {
     if (element.tagName === "meta") {
       switch (element.getAttribute("property")) {
         case "og:title":
-          this.title ||= element.getAttribute("content") ?? "";
-          break;
         case "twitter:title":
-          this.title ||= element.getAttribute("content") ?? "";
+          if (this.title) break;
+          this.title = element.getAttribute("content") ?? "";
           break;
         case "description":
-          this.description ||= element.getAttribute("content") ?? "";
-          break;
         case "og:description":
-          this.description ||= element.getAttribute("content") ?? "";
-          break;
         case "twitter:description":
-          this.description ||= element.getAttribute("content") ?? "";
+          if (this.description) break;
+          this.description = element.getAttribute("content") ?? "";
           break;
         case "og:image":
-          this.imageUrl ||= element.getAttribute("content") ?? "";
-          break;
         case "twitter:image":
-          this.imageUrl ||= element.getAttribute("content") ?? "";
+          if (this.imageUrl) break;
+          this.imageUrl = element.getAttribute("content") ?? "";
           break;
       }
     }
     if (element.tagName === "title") {
-      this.title ||= element.textContent ?? "";
+      if (this.title) return;
+      this.title = element.textContent ?? "";
     }
     if (element.tagName === "link") {
-      if (element.getAttribute("rel") === "icon") {
-        this.faviconUrl ||= element.getAttribute("href") ?? "";
+      switch (element.getAttribute("rel")) {
+        case "icon":
+        case "shortcut icon":
+          if (this.faviconUrl) break;
+          this.faviconUrl = element.getAttribute("href") ?? "";
+          break;
       }
     }
   }
 }
+
+const CACHE_DURATION = 60 * 60; // 1 hour
 
 export default {
   async fetch(req) {
@@ -67,11 +69,18 @@ export default {
     // wait the end of the transformation
     await res.text();
 
-    ogp.faviconUrl = new URL(ogp.faviconUrl ?? "", decodedUrl).toString();
-    ogp.imageUrl = new URL(ogp.imageUrl ?? "", decodedUrl).toString();
+    if (ogp.imageUrl.startsWith("/")) {
+      ogp.imageUrl = new URL(ogp.imageUrl, decodedUrl).toString();
+    }
+    if (ogp.faviconUrl.startsWith("/")) {
+      ogp.faviconUrl = new URL(ogp.faviconUrl, decodedUrl).toString();
+    }
 
     return new Response(JSON.stringify(ogp), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": `public, s-maxage=${CACHE_DURATION}`,
+      },
     });
   },
 } as ExportedHandler;
