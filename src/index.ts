@@ -25,10 +25,6 @@ class OGPParser {
           break;
       }
     }
-    if (element.tagName === "title") {
-      if (this.title) return;
-      this.title = element.textContent ?? "";
-    }
     if (element.tagName === "link") {
       switch (element.getAttribute("rel")) {
         case "icon":
@@ -38,6 +34,11 @@ class OGPParser {
           break;
       }
     }
+  }
+
+  text(text: Text) {
+    if (this.title) return;
+    this.title = text.text;
   }
 }
 
