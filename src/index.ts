@@ -90,7 +90,7 @@ export default {
 
     const response = new Response(JSON.stringify(ogp), { headers });
 
-    ctx.waitUntil(cache.put(cacheKey, response));
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
 
     return response;
   },
