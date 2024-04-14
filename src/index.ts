@@ -41,7 +41,7 @@ class OGPParser {
   }
 }
 
-const CACHE_DURATION = 60 * 60; // 1 hour
+const CACHE_DURATION = 60 * 10; // 1 hour
 
 export default {
   async fetch(req) {
