@@ -1,0 +1,16 @@
+{
+  "name": "ogp-fetch-worker",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "build": "twrangler build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.1.19",
+    "@cloudflare/workers-types": "^4.20240405.0",
+    "twrangler": "0.0.7",
+    "vitest": "1.3.0",
+    "wrangler": "^3.50.0"
+  }
+}
