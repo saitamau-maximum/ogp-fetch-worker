@@ -45,8 +45,12 @@ class OGPParser {
 const CACHE_DURATION = 60 * 10; // 1 hour
 
 export default {
-  async fetch(req) {
+  async fetch(req, _, ctx) {
     const url = new URL(req.url);
+    const cacheKey = new Request(url.toString(), req);
+    const cache = caches.default;
+    const cachedResponse = await cache.match(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     const paramUrl = url.searchParams.get("url");
     if (paramUrl === null) {
@@ -82,8 +86,12 @@ export default {
     headers.set("Access-Control-Allow-Methods", "GET");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
     headers.set("Content-Type", "application/json");
-    headers.set("Cache-Control", `public, s-maxage=${CACHE_DURATION}`);
+    headers.set("Cache-Control", `public, max-age=${CACHE_DURATION}`);
 
-    return new Response(JSON.stringify(ogp), { headers });
+    const response = new Response(JSON.stringify(ogp), { headers });
+
+    ctx.waitUntil(cache.put(cacheKey, response));
+
+    return response;
   },
 } as ExportedHandler;
