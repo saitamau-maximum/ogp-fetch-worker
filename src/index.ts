@@ -8,17 +8,28 @@ class OGPParser {
     if (element.tagName === "meta") {
       switch (element.getAttribute("property")) {
         case "og:title":
-        case "twitter:title":
           if (this.title) break;
           this.title = element.getAttribute("content") ?? "";
           break;
-        case "description":
         case "og:description":
-        case "twitter:description":
           if (this.description) break;
           this.description = element.getAttribute("content") ?? "";
           break;
         case "og:image":
+          if (this.imageUrl) break;
+          this.imageUrl = element.getAttribute("content") ?? "";
+          break;
+      }
+      switch (element.getAttribute("name")) {
+        case "title":
+          if (this.title) break;
+          this.title = element.getAttribute("content") ?? "";
+          break;
+        case "description":
+        case "twitter:description":
+          if (this.description) break;
+          this.description = element.getAttribute("content") ?? "";
+          break;
         case "twitter:image":
           if (this.imageUrl) break;
           this.imageUrl = element.getAttribute("content") ?? "";
