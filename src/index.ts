@@ -71,8 +71,15 @@ export default {
     const decodedUrl = decodeURIComponent(paramUrl);
 
     const siteRes = await fetch(decodedUrl);
+    const headers = new Headers();
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Access-Control-Allow-Methods", "GET");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Content-Type", "application/json");
+    headers.set("Cache-Control", `public, max-age=${CACHE_DURATION}`);
+
     if (!siteRes.ok) {
-      return new Response("Not Found", { status: 404 });
+      return new Response("Not Found", { status: 404, headers });
     }
 
     const ogp = new OGPParser();
@@ -92,15 +99,8 @@ export default {
       ogp.faviconUrl = new URL(ogp.faviconUrl, decodedUrl).toString();
     }
 
-    const headers = new Headers();
-    headers.set("Access-Control-Allow-Origin", "*");
-    headers.set("Access-Control-Allow-Methods", "GET");
-    headers.set("Access-Control-Allow-Headers", "Content-Type");
-    headers.set("Content-Type", "application/json");
-    headers.set("Cache-Control", `public, max-age=${CACHE_DURATION}`);
 
     const response = new Response(JSON.stringify(ogp), { headers });
-
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
 
     return response;
