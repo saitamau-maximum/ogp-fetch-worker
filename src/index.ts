@@ -77,6 +77,7 @@ export default {
     headers.set("Access-Control-Allow-Headers", "Content-Type");
     headers.set("Content-Type", "application/json");
     headers.set("Cache-Control", `public, max-age=${CACHE_DURATION}`);
+    headers.set("User-Agent", "Maximumbot");
 
     if (!siteRes.ok) {
       return new Response("Not Found", { status: 404, headers });
