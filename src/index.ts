@@ -70,14 +70,17 @@ export default {
 
     const decodedUrl = decodeURIComponent(paramUrl);
 
-    const siteRes = await fetch(decodedUrl);
+    const siteRes = await fetch(decodedUrl, {
+      headers: {
+        "User-Agent": "Maximumbot",
+      },
+    });
     const headers = new Headers();
     headers.set("Access-Control-Allow-Origin", "*");
     headers.set("Access-Control-Allow-Methods", "GET");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
     headers.set("Content-Type", "application/json");
     headers.set("Cache-Control", `public, max-age=${CACHE_DURATION}`);
-    headers.set("User-Agent", "Maximumbot");
 
     if (!siteRes.ok) {
       return new Response("Not Found", { status: 404, headers });
@@ -99,7 +102,6 @@ export default {
     if (ogp.faviconUrl.startsWith("/")) {
       ogp.faviconUrl = new URL(ogp.faviconUrl, decodedUrl).toString();
     }
-
 
     const response = new Response(JSON.stringify(ogp), { headers });
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
